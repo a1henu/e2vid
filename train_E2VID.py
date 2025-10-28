@@ -10,7 +10,7 @@ from torch.nn import L1Loss
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 from torch.optim.lr_scheduler import CosineAnnealingLR
-from torch.optim import AdamW
+from torch.optim import Adam
 
 from dataset.dataset import SeqDataset
 from dataset.pt_seq import PTSeqDataset
@@ -245,7 +245,7 @@ def main():
     params_group = [
         {"params": e2vid.parameters(),   "lr": lr_e2vid},
     ]
-    optimizer = AdamW(params_group, weight_decay=weight_decay)
+    optimizer = Adam(params_group, weight_decay=weight_decay)
 
     # Loss
     loss_obj = (
