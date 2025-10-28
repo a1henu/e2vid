@@ -1,0 +1,4 @@
+ffmpeg -i /mnt/D/baichenxu/code/rpg_e2vid/outputs/1021_video/video_30Hz.mp4 -i /mnt/D/baichenxu/code/rpg_e2vid/outputs/1021_video_e2vid/e2vid_video_30Hz.mp4 \
+-filter_complex "[0:v]setpts=PTS-STARTPTS,scale=-1:720[v0];[1:v]setpts=PTS-STARTPTS,scale=-1:720[v1];[v0][v1]hstack=2[v]" -map "[v]" -shortest -c:v libx264 -crf 18 -preset veryfast out_side_by_side.mp4
+
+ffmpeg -i e2vid_video_150Hz.mp4 -i adae2vid_video_150Hz.mp4 -filter_complex "[0:v]setpts=PTS-STARTPTS,scale=-1:636[v0];[1:v]setpts=PTS-STARTPTS,scale=-1:636[v1];[v0][v1]hstack=2[v]" -map "[v]" -shortest -c:v libx264 -crf 18 -preset veryfast out_side_by_side.mp4

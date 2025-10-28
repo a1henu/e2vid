@@ -1,0 +1,42 @@
+adapter:
+  ckpt_path: ./pretrained/pretrained_adapter.pth.tar
+  num_bins: 5
+  num_encoders: 3
+  base_num_channels: 32
+  num_residual_blocks: 2
+  skip_type: sum
+  norm: BN
+  upsampling: transposed
+  use_upsample_conv: False
+  recurrent_block: convlstm
+  kernel_size: 3
+
+model:
+  adapter_ckpt: ./pretrained/pretrained_adapter.pth.tar
+  e2vid_ckpt: ./pretrained/pretrained_e2vid.pth.tar
+
+train:
+  save_dir: ./logs/20251026/e2vid_adapter/
+  dataroot: /mnt/D/baichenxu/datasets/ecoco_depthmaps_test/
+  num_iter: 30
+  num_workers: 8
+  batch_size: 4
+  num_epochs: 150
+  weight_decay: 0.0
+  grad_clip: 1.0
+  save_freq: 10
+  val_freq: 5
+  grad_log_every: 50
+  freeze_e2vid: True
+
+  lr_adapter: 1e-5
+  lr_e2vid: 0
+  scheduler:
+    type: CosineAnnealingLR
+    T_max: 150
+    eta_min: 1e-7
+  l1_weight: 1.0
+  lpips_weight: 1.0
+  tc_weight: 5.0
+  tc_alpha: 50.0
+

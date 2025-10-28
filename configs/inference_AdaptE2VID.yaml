@@ -1,0 +1,38 @@
+adapter:
+  ckpt_path: ./logs/20251022/e2vid_model/adapter_best.pth.tar
+  num_bins: 5
+  num_encoders: 3
+  base_num_channels: 32
+  num_residual_blocks: 2
+  skip_type: sum
+  norm: BN
+  upsampling: transposed
+  use_upsample_conv: False
+  recurrent_block: convlstm
+  kernel_size: 3
+
+model:
+  ckpt_path: ./logs/20251022/e2vid_model/e2vid_best.pth.tar
+  num_bins: 5
+  num_encoders: 3
+  base_num_channels: 32
+  num_residual_blocks: 2
+  skip_type: sum
+  norm: BN
+  upsampling: transposed
+  use_upsample_conv: False
+  recurrent_block: convlstm
+  kernel_size: 3
+
+inference:
+  adapter_ckpt: ./logs/20251022/e2vid_model/adapter_best.pth.tar
+  e2vid_ckpt: ./logs/20251022/e2vid_model/e2vid_best.pth.tar
+
+  num_events_per_pixel: 0.2
+
+  skip_events: 0
+  suboffset: 0
+
+  compute_voxel_on_gpu: True
+
+  

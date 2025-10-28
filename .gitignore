@@ -1,0 +1,8 @@
+outputs
+logs
+debug_viz
+pretrained
+data
+
+__pycache__
+*/__pycache__/

@@ -1,0 +1,1 @@
+python train_E2VID.py --config configs/train_e2vid.yaml
