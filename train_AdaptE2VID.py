@@ -128,10 +128,13 @@ def train_one_epoch(
                 f0_vox = f0.repeat(1, num_bins, 1, 1)
                 p0, prev_states = adapter(f0_vox, prev_states)
                 adapter_loss = l1loss(p0, f0)
+                batch_loss["total"] += l1_weight * adapter_loss
+                batch_loss["l1"]    += l1_weight * adapter_loss
 
             recon, states = e2vid(ev, prev_states)
             
-            l1_loss = l1loss(recon, f1)
+            # l1_loss = l1loss(recon, f1)
+            l1_loss = 0
             if current_L < L0:
                 tc_loss = 0
                 current_L += 1
@@ -140,8 +143,8 @@ def train_one_epoch(
             lpips_loss = lpipsloss(recon, f1)
 
             # 统计显示
-            batch_loss["total"] += (l1_weight * (l1_loss + adapter_loss) + lpips_weight * lpips_loss + tc_weight * tc_loss)
-            batch_loss["l1"]    += l1_weight * (l1_loss + adapter_loss)
+            batch_loss["total"] += (l1_weight * l1_loss + lpips_weight * lpips_loss + tc_weight * tc_loss)
+            batch_loss["l1"]    += l1_weight * l1_loss
             batch_loss["lpips"] += lpips_weight * lpips_loss
             batch_loss["tc"]    += tc_weight * tc_loss
 
@@ -257,10 +260,13 @@ def validate_one_epoch(
                 f0_vox = f0.repeat(1, num_bins, 1, 1)
                 p0, prev_states = adapter(f0_vox, None)
                 adapter_loss = l1loss(p0, f0)
+                epoch_loss["total"] += l1_weight * adapter_loss
+                epoch_loss["l1"]    += l1_weight * adapter_loss
 
             recon, states = e2vid(ev, prev_states)
             
-            l1_loss = l1loss(recon, f1)
+            # l1_loss = l1loss(recon, f1)
+            l1_loss = 0
             if current_L < L0:
                 tc_loss = 0
                 current_L += 1
@@ -268,8 +274,8 @@ def validate_one_epoch(
                 tc_loss = tcloss(f0, f1, p0, recon, fl)
             lpips_loss = lpipsloss(recon, f1)
 
-            epoch_loss["total"] += float(l1_weight * (l1_loss + adapter_loss) + lpips_weight * lpips_loss + tc_weight * tc_loss)
-            epoch_loss["l1"]    += float(l1_weight * (l1_loss + adapter_loss))
+            epoch_loss["total"] += float(l1_weight * l1_loss + lpips_weight * lpips_loss + tc_weight * tc_loss)
+            epoch_loss["l1"]    += float(l1_weight * l1_loss)
             epoch_loss["lpips"] += float(lpips_weight * lpips_loss)
             epoch_loss["tc"]    += float(tc_weight * tc_loss)
             num_steps_sum += 1
@@ -367,7 +373,7 @@ def main():
     )
     val_dataset = SeqDataset(
         root=train_config["dataroot"], 
-        split="validation", 
+        split="val", 
         transform=SeqCrop128(mode="center", pad_if_small=True),
         num_iter=train_config.get("num_iter", 30)
     )

@@ -32,7 +32,7 @@ options = {
 device = get_device(use_gpu=True)
 # e2vid_ckpt = '/mnt/D/baichenxu/code/rpg_e2vid/pretrained/pretrained_e2vid.pth.tar'
 # e2vid = load_model(e2vid_ckpt).to(device)
-e2vid_ckpt = '/mnt/D/baichenxu/code/rpg_e2vid/logs/20251026/e2vid_model/e2vid_epoch_0200.pth.tar'
+e2vid_ckpt = '/mnt/D/baichenxu/code/rpg_e2vid/logs/20251028/e2vid_model/e2vid_epoch_0160.pth.tar'
 e2vid = E2VIDRecurrent(options).to(device)
 
 parser = argparse.ArgumentParser(description='Testing AdaptE2VID model')

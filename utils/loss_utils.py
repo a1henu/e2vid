@@ -1,3 +1,4 @@
+import cv2
 import numpy as np
 import torch
 import torch.nn.functional as F
@@ -150,3 +151,28 @@ def voxel_warping_flow_loss(voxel, displacement, output_images=False, reverse_ti
         return tc_loss, additional_output
     else:
         return tc_loss
+
+if __name__ == '__main__':
+    f0_path = '/mnt/E/baichenxu/datasets/sta_dyn_dataset/scene_0010/frames/frame_000023.png'
+    f1_path = '/mnt/E/baichenxu/datasets/sta_dyn_dataset/scene_0010/frames/frame_000024.png'
+    fl_path = '/mnt/E/baichenxu/datasets/sta_dyn_dataset/scene_0010/flow/flow_000024.npy'
+
+    f0 = cv2.imread(f0_path, cv2.IMREAD_GRAYSCALE)
+    f1 = cv2.imread(f1_path, cv2.IMREAD_GRAYSCALE)
+    fl = np.load(fl_path)
+    fl[1, :, :] *= 1
+        
+    f0 = torch.from_numpy(f0).unsqueeze(0).unsqueeze(0).float() / 255.0
+    f1 = torch.from_numpy(f1).unsqueeze(0).unsqueeze(0).float() / 255.0
+    fl = torch.from_numpy(fl).unsqueeze(0).float()
+    
+    tc_loss, additional = temporal_consistency_loss(f0, f1, f0, f1, fl, output_images=True)
+    
+    I0, I1, I0_warped, P0_warped, vis_mask, err_map = additional['image0'], additional['image1'], additional['image0_warped_to1'], additional['processed0_warped_to1'], additional['visibility_mask'], additional['error_map']
+    
+    cv2.imwrite('I0.png', (I0.squeeze().cpu().numpy()*255).astype(np.uint8))
+    cv2.imwrite('I1.png', (I1.squeeze().cpu().numpy()*255).astype(np.uint8))
+    cv2.imwrite('I0_warped.png', (I0_warped.squeeze().cpu().numpy()*255).astype(np.uint8))
+    cv2.imwrite('vis_mask.png', (vis_mask.squeeze().cpu().numpy()*255).astype(np.uint8))
+    cv2.imwrite('err_map.png', (err_map.squeeze().cpu().numpy()*255).astype(np.uint8))
+    

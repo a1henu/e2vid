@@ -1,5 +1,5 @@
 adapter:
-  ckpt_path: ./logs/20251026/e2vid_adapter/adapter_best.pth.tar
+  ckpt_path: ./logs/20251031_without_l1/e2vid_adapter/adapter_epoch_0080.pth.tar
   num_bins: 5
   num_encoders: 3
   base_num_channels: 32
@@ -12,16 +12,16 @@ adapter:
   kernel_size: 3
 
 model:
-  adapter_ckpt: ./logs/20251026/e2vid_adapter/adapter_best.pth.tar
+  adapter_ckpt: ./logs/20251031_without_l1/e2vid_adapter/adapter_epoch_0080.pth.tar
   e2vid_ckpt: ./pretrained/pretrained_e2vid.pth.tar
 
 train:
-  save_dir: ./logs/20251026/ada_e2vid_model/
-  dataroot: /mnt/D/baichenxu/datasets/ecoco_depthmaps_test/
+  save_dir: ./logs/20251031_without_l1/ada_e2vid_model/
+  dataroot: /mnt/D/baichenxu/datasets/ApEvid_dataset
   num_iter: 30
   num_workers: 8
   batch_size: 4
-  num_epochs: 150
+  num_epochs: 100
   weight_decay: 0.0
   grad_clip: 1.0
   save_freq: 10
@@ -33,7 +33,7 @@ train:
   lr_e2vid: 1e-5
   scheduler:
     type: CosineAnnealingLR
-    T_max: 150
+    T_max: 100
     eta_min: 1e-7
   l1_weight: 1.0
   lpips_weight: 1.0

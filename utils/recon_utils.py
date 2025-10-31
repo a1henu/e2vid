@@ -34,9 +34,9 @@ class AdaE2VIDReconstructor():
          """
         # print('== AdaE2VID Reconstruction == ')
         # print('Image size: {}x{}'.format(self.width, self.height))
-        
         init_vox = init_frame.repeat(1, self.num_bins, 1, 1)
         init_vox = self.crop.pad(init_vox)
+        # print(init_vox.shape)
         with torch.no_grad():
             _, prev_state = self.adapter(init_vox, self.prev_state)
             # _, prev_state = self.adapter(init_vox, None)

@@ -16,12 +16,12 @@ model:
   e2vid_ckpt: ./pretrained/pretrained_e2vid.pth.tar
 
 train:
-  save_dir: ./logs/20251026/e2vid_adapter/
-  dataroot: /mnt/D/baichenxu/datasets/ecoco_depthmaps_test/
+  save_dir: ./logs/20251031_without_l1/e2vid_adapter/
+  dataroot: /mnt/D/baichenxu/datasets/ApEvid_dataset
   num_iter: 30
   num_workers: 8
   batch_size: 4
-  num_epochs: 150
+  num_epochs: 80
   weight_decay: 0.0
   grad_clip: 1.0
   save_freq: 10
@@ -33,7 +33,7 @@ train:
   lr_e2vid: 0
   scheduler:
     type: CosineAnnealingLR
-    T_max: 150
+    T_max: 80
     eta_min: 1e-7
   l1_weight: 1.0
   lpips_weight: 1.0

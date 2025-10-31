@@ -166,11 +166,11 @@ It can be convenient to convert an image folder to a video with a fixed framerat
 You can proceed as follows:
 
 ```bash
-export FRAMERATE=150
-python resample_reconstructions.py -i ../outputs/EvAid/playball/adae2vid_reconstruction -o ../outputs/EvAid/playball/adae2vid_resampled -r $FRAMERATE
-ffmpeg -framerate $FRAMERATE -i ../outputs/EvAid/playball/adae2vid_resampled/frame_%010d.png ../outputs/EvAid/playball/adae2vid_video_"$FRAMERATE"Hz.mp4
-python resample_reconstructions.py -i ../outputs/EvAid/playball/e2vid_reconstruction -o ../outputs/EvAid/playball/e2vid_resampled -r $FRAMERATE
-ffmpeg -framerate $FRAMERATE -i ../outputs/EvAid/playball/e2vid_resampled/frame_%010d.png ../outputs/EvAid/playball/e2vid_video_"$FRAMERATE"Hz.mp4
+export FRAMERATE=30
+python resample_reconstructions.py -i /mnt/nas-cp/baichenxu/EvHDR/data/251028_real_data/ap_330-v_1600/outputs/recon_0_1/reconstruction -o /mnt/nas-cp/baichenxu/EvHDR/data/251028_real_data/ap_330-v_1600/outputs/recon_0_1/resampled -r $FRAMERATE
+ffmpeg -framerate $FRAMERATE -i /mnt/nas-cp/baichenxu/EvHDR/data/251028_real_data/ap_330-v_1600/outputs/recon_0_1/resampled/frame_%010d.png /mnt/nas-cp/baichenxu/EvHDR/data/251028_real_data/ap_330-v_1600/outputs/recon_0_1/adae2vid_video_"$FRAMERATE"Hz.mp4
+python resample_reconstructions.py -i /mnt/nas-cp/baichenxu/EvHDR/data/251028_real_data/ap_330-v_1600/outputs/recon_0_1/e2vid_reconstruction -o /mnt/nas-cp/baichenxu/EvHDR/data/251028_real_data/ap_330-v_1600/outputs/recon_0_1/e2vid_resampled -r $FRAMERATE
+ffmpeg -framerate $FRAMERATE -i /mnt/nas-cp/baichenxu/EvHDR/data/251028_real_data/ap_330-v_1600/outputs/recon_0_1/e2vid_resampled/frame_%010d.png /mnt/nas-cp/baichenxu/EvHDR/data/251028_real_data/ap_330-v_1600/outputs/recon_0_1/e2vid_video_"$FRAMERATE"Hz.mp4
 ```
 
 ## Acknowledgements

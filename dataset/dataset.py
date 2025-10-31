@@ -111,7 +111,7 @@ class SeqDataset(Dataset):
         self,
         root: str, split: str = "train",
         frame_dir="frames",
-        event_dir="VoxelGrid-betweenframes-5",
+        event_dir="voxels",
         flow_dir="flow",
         num_iter: int = 30,
         transform: Optional[Callable] = None,  
@@ -123,7 +123,7 @@ class SeqDataset(Dataset):
         p_vflip: float = 0.5,
         quadruple: bool = True,
     ):
-        assert split in ("train", "validation")
+        assert split in ("train", "val")
         self.root = os.path.join(root, split)
         self.frame_dir = frame_dir
         self.event_dir = event_dir
@@ -147,7 +147,7 @@ class SeqDataset(Dataset):
             if not (os.path.isdir(fdir) and os.path.isdir(edir) and os.path.isdir(fldir)):
                 continue
             # 可选：也可检查文件完整性
-            self.metas.append(_SeqMeta(seqp, self.num_iter + 1))
+            self.metas.append(_SeqMeta(seqp, self.num_iter))
 
         if not self.metas:
             raise RuntimeError(f"No valid sequences under {self.root}")
@@ -199,8 +199,8 @@ class SeqDataset(Dataset):
         fdir, edir, fldir = (os.path.join(seqp, d) for d in (self.frame_dir, self.event_dir, self.flow_dir))
 
         frames = torch.stack([load_image(os.path.join(fdir, f"frame_{i:010d}.png")) for i in range(n)], dim=0)     # [T+1,1,H,W]
-        events = torch.stack([load_events(os.path.join(edir, f"event_tensor_{i:010d}.npy")) for i in range(n-1)], dim=0)  # [T,B,H,W]
-        flows  = torch.stack([load_flow  (os.path.join(fldir, f"disp01_{i:010d}.npy")) for i in range(1, n)], dim=0)      # [T,2,H,W]
+        events = torch.stack([load_events(os.path.join(edir, f"voxel_{i:010d}.npy")) for i in range(n-1)], dim=0)  # [T,B,H,W]
+        flows  = torch.stack([load_flow  (os.path.join(fldir, f"disp01_{i:010d}.npy")) for i in range(n-1)], dim=0)      # [T,2,H,W]
 
         seq_name = os.path.basename(seqp)
 
@@ -227,7 +227,7 @@ class SeqDataset(Dataset):
 
 
 if __name__ == "__main__":
-    dataroot = "/mnt/D/baichenxu/datasets/ecoco_depthmaps_test"
+    dataroot = "/mnt/E/baichenxu/datasets/ApEvid_dataset"
     dataset = SeqDataset(root=dataroot, split='train')
     print(f"Dataset length: {len(dataset)}")
     sample = dataset[0]

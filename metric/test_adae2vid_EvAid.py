@@ -14,10 +14,10 @@ from options.inference_options import set_inference_options
 from utils.inference_utils import get_device, events_to_voxel_grid_pytorch
 from utils.recon_utils import AdaE2VIDReconstructor
 
-dataset_root = '/mnt/nas-cp/liboyu/EvAid/data_align-n/HFR/HFR-aligned'
-
-adapter_ckpt = '/mnt/D/baichenxu/code/rpg_e2vid/logs/20251022/e2vid_model/adapter_best.pth.tar'
-e2vid_ckpt = '/mnt/D/baichenxu/code/rpg_e2vid/logs/20251022/e2vid_model/e2vid_best.pth.tar'
+# dataset_root = '/mnt/nas-cp/liboyu/EvAid/data_align-n/HFR/HFR-aligned'
+dataset_root = '/mnt/nas-cp/liboyu/EvAid/data_align-n/recons/recons-aligned'
+adapter_ckpt = '/mnt/D/baichenxu/code/rpg_e2vid/logs/20251030/ada_e2vid_model/adapter_best.pth.tar'
+e2vid_ckpt = '/mnt/D/baichenxu/code/rpg_e2vid/logs/20251030/ada_e2vid_model/e2vid_best.pth.tar'
 
 width = 954
 height = 636
@@ -32,7 +32,7 @@ options = {
 }
 
 parser = argparse.ArgumentParser(description='Testing AdaptE2VID model')
-parser.add_argument('--data', type=str, default='wall', help='Name of the dataset to test on')
+parser.add_argument('--data', type=str, default='playball', help='Name of the dataset to test on')
 set_inference_options(parser)
 args = parser.parse_args()
 
@@ -53,10 +53,10 @@ dataset_path = os.path.join(dataset_root, args.data)
 frames_path = os.path.join(dataset_path, 'gt')
 events_path = os.path.join(dataset_path, 'event')
 
-for idx in range(len(os.listdir(events_path)))[1:1500]:
-    event_name = f'{idx:06d}.txt'
-    if idx == 1:
-        init_frame = cv2.imread(os.path.join(frames_path, f'{idx:06d}_img.jpg'), cv2.IMREAD_GRAYSCALE)
+for idx in range(len(os.listdir(events_path))):
+    event_name = f'{idx+1:06d}.txt'
+    if idx % 500 == 0:
+        init_frame = cv2.imread(os.path.join(frames_path, f'{idx+1:06d}_img.jpg'), cv2.IMREAD_GRAYSCALE)
         init_frame = torch.from_numpy(init_frame).unsqueeze(0).float() / 255.0
         reconstructor.initialize(init_frame.unsqueeze(0).to(device))
         

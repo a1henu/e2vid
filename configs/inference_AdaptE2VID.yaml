@@ -1,5 +1,5 @@
 adapter:
-  ckpt_path: ./logs/20251022/e2vid_model/adapter_best.pth.tar
+  ckpt_path: ./logs/20251028/ada_e2vid_model/adapter_best.pth.tar
   num_bins: 5
   num_encoders: 3
   base_num_channels: 32
@@ -12,7 +12,7 @@ adapter:
   kernel_size: 3
 
 model:
-  ckpt_path: ./logs/20251022/e2vid_model/e2vid_best.pth.tar
+  ckpt_path: ./logs/20251030/ada_e2vid_model/e2vid_best.pth.tar
   num_bins: 5
   num_encoders: 3
   base_num_channels: 32
@@ -25,8 +25,8 @@ model:
   kernel_size: 3
 
 inference:
-  adapter_ckpt: ./logs/20251022/e2vid_model/adapter_best.pth.tar
-  e2vid_ckpt: ./logs/20251022/e2vid_model/e2vid_best.pth.tar
+  adapter_ckpt: ./logs/20251030/ada_e2vid_model/adapter_best.pth.tar
+  e2vid_ckpt: ./logs/20251030/ada_e2vid_model/e2vid_best.pth.tar
 
   num_events_per_pixel: 0.2
 
