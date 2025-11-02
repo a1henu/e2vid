@@ -1,0 +1,2 @@
+python inference_EvAid.py --experiment_name 1030_model --recons_ckpt /mnt/D/baichenxu/code/rpg_e2vid/logs/20251030/biape2vid_model/biape2vid_best.pth.tar
+python inference_EvAid.py --experiment_name 1101_model_without_l1 --recons_ckpt /mnt/D/baichenxu/code/rpg_e2vid/logs/20251101_without_l1/biape2vid_model/biape2vid_best.pth.tar

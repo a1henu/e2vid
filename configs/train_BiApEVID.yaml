@@ -3,6 +3,8 @@ params:
   num_encoders: 3
   base_num_channels: 32
   num_residual_blocks: 2
+  height: 128
+  width: 128
   skip_type: sum
   norm: BN
   upsampling: transposed
@@ -11,16 +13,16 @@ params:
   kernel_size: 3
 
 model:
-  adapter_ckpt: ./logs/20251030/ada_e2vid_model/adapter_best.pth.tar
-  e2vid_ckpt: ./logs/20251030/ada_e2vid_model/e2vid_best.pth.tar
+  adapter_ckpt: ./logs/20251101_without_l1/e2vid_adapter/adapter_best.pth.tar
+  e2vid_ckpt: ./pretrained/pretrained_e2vid.pth.tar
 
 train:
-  save_dir: ./logs/20251030/biape2vid_model/
+  save_dir: ./logs/20251101_without_l1/biape2vid_model/
   dataroot: /mnt/D/baichenxu/datasets/ApEvid_dataset
   num_iter: 30
   num_workers: 8
   batch_size: 4
-  num_epochs: 50
+  num_epochs: 100
   weight_decay: 0.0
   grad_clip: 1.0
   save_freq: 10
@@ -31,9 +33,10 @@ train:
   lr: 1e-5
   scheduler:
     type: CosineAnnealingLR
-    T_max: 50
+    T_max: 100
     eta_min: 1e-7
-  l1_weight: 1.0
+  adapter_weight: 1.0
+  l1_weight: 0.0
   lpips_weight: 1.0
   tc_weight: 5.0
   tc_alpha: 50.0

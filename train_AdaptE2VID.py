@@ -98,7 +98,7 @@ def train_one_epoch(
             p.requires_grad = True
 
     l1loss, lpipsloss, tcloss = loss_obj
-    l1_weight, lpips_weight, tc_weight = loss_weights
+    adapter_weight, l1_weight, lpips_weight, tc_weight = loss_weights
     epoch_loss = {"total": 0.0, "l1": 0.0, "lpips": 0.0, "tc": 0.0}
     num_batches = len(train_loader)
 
@@ -128,8 +128,8 @@ def train_one_epoch(
                 f0_vox = f0.repeat(1, num_bins, 1, 1)
                 p0, prev_states = adapter(f0_vox, prev_states)
                 adapter_loss = l1loss(p0, f0)
-                batch_loss["total"] += l1_weight * adapter_loss
-                batch_loss["l1"]    += l1_weight * adapter_loss
+                batch_loss["total"] += adapter_weight * adapter_loss
+                batch_loss["l1"]    += adapter_weight * adapter_loss
 
             recon, states = e2vid(ev, prev_states)
             
@@ -229,7 +229,7 @@ def validate_one_epoch(
     e2vid.eval()
     
     l1loss, lpipsloss, tcloss = loss_obj
-    l1_weight, lpips_weight, tc_weight = loss_weights
+    adapter_weight, l1_weight, lpips_weight, tc_weight = loss_weights
 
     epoch_loss = {"total": 0.0, "l1": 0.0, "lpips": 0.0, "tc": 0.0}
     num_steps_sum = 0
@@ -260,8 +260,8 @@ def validate_one_epoch(
                 f0_vox = f0.repeat(1, num_bins, 1, 1)
                 p0, prev_states = adapter(f0_vox, None)
                 adapter_loss = l1loss(p0, f0)
-                epoch_loss["total"] += l1_weight * adapter_loss
-                epoch_loss["l1"]    += l1_weight * adapter_loss
+                epoch_loss["total"] += adapter_weight * adapter_loss
+                epoch_loss["l1"]    += adapter_weight * adapter_loss
 
             recon, states = e2vid(ev, prev_states)
             
@@ -359,6 +359,7 @@ def main():
         TCLoss(alpha=50.0),
     )
     loss_weights = (
+        _as_float(train_config.get("adapter_weight", 1.0), "train.adapter_weight"),
         _as_float(train_config.get("l1_weight", 1.0), "train.l1_weight"),
         _as_float(train_config.get("lpips_weight", 1.0), "train.lpips_weight"),
         _as_float(train_config.get("tc_weight", 5.0), "train.tc_weight"),

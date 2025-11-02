@@ -58,13 +58,13 @@ def calc_loss(
     flows:  (B, T, 2, H, W)
     """
     l1_loss, lpips_loss, tc_loss = loss_obj
-    l1_weight, lpips_weight, tc_weight = loss_weights
+    adapter_weight, l1_weight, lpips_weight, tc_weight = loss_weights
     
     B, T1, _, H, W = frames.shape
     T = T1 - 1
     
     total_loss = {"adapter": 0.0, "l1": 0.0, "lpips": 0.0, "tc": 0.0, "total": 0.0}
-    total_loss['adapter'] += l1_weight * (l1_loss(adapter_i0, frames[:,0]) + l1_loss(adapter_i1, frames[:,-1]))
+    total_loss['adapter'] += adapter_weight * (l1_loss(adapter_i0, frames[:,0]) + l1_loss(adapter_i1, frames[:,-1]))
     for i in range(T):
         f0 = frames[:, i]
         f1 = frames[:, i+1]
@@ -231,6 +231,7 @@ def main():
         TCLoss(alpha=50.0)
     )
     loss_weights = (
+        _as_float(train_params.get("adapter_weight", 1.0), name="adapter_weight"),
         _as_float(train_params.get("l1_weight", 1.0), name="l1_weight"),
         _as_float(train_params.get("lpips_weight", 1.0), name="lpips_weight"),
         _as_float(train_params.get("tc_weight", 1.0), name="tc_weight"),

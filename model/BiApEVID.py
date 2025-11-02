@@ -30,7 +30,7 @@ class Mixer(nn.Module):
         x = torch.cat([s0, s1, feats], dim=1)  # [B, 2+feat_ch, H, W]
         logits = self.net(x)                   # [B, 2, H, W]
         w = torch.softmax(logits, dim=1)       # [B, 2, H, W]
-        fused = (w[:, 0] * s0) + (w[:, 1] * s1)
+        fused = (w[:, 0:1] * s0) + (w[:, 1:2] * s1)
         return fused, w
     
 class BiApEVID(nn.Module):
@@ -43,8 +43,8 @@ class BiApEVID(nn.Module):
         self.mixer   = Mixer(feat_ch=self.feat_ch)
 
         self.device = get_device(use_gpu=True)
-        self.height = e2vid.config['height']
-        self.width  = e2vid.config['width']
+        self.height = e2vid.config.get('height', 720)
+        self.width  = e2vid.config.get('width', 1280)
         self.num_bins = e2vid.config['num_bins']
         self.crop = CropParameters(self.width, self.height, e2vid.config['num_encoders'])
 
@@ -75,7 +75,7 @@ class BiApEVID(nn.Module):
             s0 = fwd[i]
             s1 = bwd[i]
             
-            ev_density = event_density(evs[:,i])
+            ev_density = event_density(evs[:,i-1])
             feats = torch.cat([ev_density, (s0 - s1).abs()], dim=1)  # [B,2,H,W]
             fused, w = self.mixer(s0, s1, feats)
             outs.append(fused)
@@ -107,11 +107,11 @@ class BiApEVID(nn.Module):
         
         fwd_filelist = [os.path.join(save_dir, f'{start_idx:06d}.png')]
         for i in range(t):
-            ev = np.loadtxt(evs_filelist[i], dtype=np.float32)
-            ev = events_to_voxel_grid_pytorch(ev, self.num_bins, self.width, self.height, self.device)
+            ev = self.load_event_to_voxel(evs_filelist[i], self.num_bins, self.width, self.height, self.device)
             ev = self.crop.pad(ev).unsqueeze(0)
             with torch.no_grad():
                 recon, st_f = self.e2vid(ev, st_f)
+                recon = self.normalize_img(recon)
             self.save_img(os.path.join(save_dir, f'{start_idx + i + 1:06d}.png'), recon[:, :, self.crop.iy0:self.crop.iy1, self.crop.ix0:self.crop.ix1])
             fwd_filelist.append(os.path.join(save_dir, f'{start_idx + i + 1:06d}.png'))
         return fwd_filelist
@@ -127,12 +127,12 @@ class BiApEVID(nn.Module):
         
         bwd_filelist = [os.path.join(save_dir, f'{end_idx:06d}.png')]
         for i in range(t-1, -1, -1):
-            ev = np.loadtxt(evs_filelist[i], dtype=np.float32)
-            ev = events_to_voxel_grid_pytorch(ev, self.num_bins, self.width, self.height, self.device)
+            ev = self.load_event_to_voxel(evs_filelist[i], self.num_bins, self.width, self.height, self.device)
             ev = self.crop.pad(ev).unsqueeze(0)
             rev_ev = reverse_voxels(ev)
             with torch.no_grad():
                 recon, st_b = self.e2vid(rev_ev, st_b)
+                recon = self.normalize_img(recon)
             self.save_img(os.path.join(save_dir, f'{start_idx + i:06d}.png'), recon[:, :, self.crop.iy0:self.crop.iy1, self.crop.ix0:self.crop.ix1])
             bwd_filelist.append(os.path.join(save_dir, f'{start_idx + i:06d}.png'))
         bwd_filelist = bwd_filelist[::-1]
@@ -140,15 +140,15 @@ class BiApEVID(nn.Module):
     
     def fuse_frames(self, evs_filelist, forward_filelist, backward_filelist, start_idx, save_dir):
         for i, (evs, fwd, bwd) in enumerate(zip(evs_filelist, forward_filelist, backward_filelist)):
-            ev = np.loadtxt(evs, dtype=np.float32)
-            ev = events_to_voxel_grid_pytorch(ev, self.num_bins, self.width, self.height, self.device)
+            ev = self.load_event_to_voxel(evs, self.num_bins, self.width, self.height, self.device)
             s0 = self.load_img(fwd, self.device)
             s1 = self.load_img(bwd, self.device)
             
             ev_density = event_density(ev.unsqueeze(0))
             feats = torch.cat([ev_density, (s0 - s1).abs()], dim=1)  # [B,2,H,W]
             fused, _ = self.mixer(s0, s1, feats)
-            self.save_img(os.path.join(save_dir, f'{start_idx + i:06d}.png'), fused)
+            fused = self.normalize_img(fused)
+            self.save_img(os.path.join(save_dir, f'{start_idx + i + 1:06d}.png'), fused)
 
     def inference(self, f0, f1, evs_filelist, start_idx, save_dir):
         fwd_filelist, bwd_filelist = self.initialize_inference(f0, f1, evs_filelist, start_idx, save_dir)
@@ -156,6 +156,17 @@ class BiApEVID(nn.Module):
         fuse_dir = os.path.join(save_dir, 'fused')
         os.makedirs(fuse_dir, exist_ok=True)
         self.fuse_frames(evs_filelist, fwd_filelist[1:], bwd_filelist[1:], start_idx, fuse_dir)
+        
+    @staticmethod
+    def load_event_to_voxel(ev_path, num_bins, width, height, device):
+        ev = np.loadtxt(ev_path, dtype=np.float32)
+        if ev.size == 0 or ev is None:
+            ev = torch.zeros((num_bins, height, width), dtype=torch.float32, device=device) 
+        else:
+            if ev.ndim == 1:
+                ev = ev[np.newaxis, :]
+            ev = events_to_voxel_grid_pytorch(ev, num_bins, width, height, device)
+        return ev
 
     @staticmethod
     def load_img(img_path, device):
@@ -168,3 +179,10 @@ class BiApEVID(nn.Module):
         img_np = img_tensor.squeeze().cpu().detach().numpy()
         img_np = (img_np * 255.0).astype(np.uint8)
         cv2.imwrite(save_path, img_np)
+        
+    @staticmethod
+    def normalize_img(img):
+        img_min = img.min()
+        img_max = img.max()
+        img_norm = (img - img_min) / (img_max - img_min + 1e-8)
+        return img_norm

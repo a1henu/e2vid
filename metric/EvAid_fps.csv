@@ -1,0 +1,15 @@
+dataset_root,dataset_name,fps,delta_time,delta_frame
+/mnt/nas-cp/liboyu/EvAid/data_align-n/recons/recons-aligned,bear,25,5,125
+/mnt/nas-cp/liboyu/EvAid/data_align-n/recons/recons-aligned,box,20,5,100
+/mnt/nas-cp/liboyu/EvAid/data_align-n/recons/recons-aligned,outdoor,18,5,90
+/mnt/nas-cp/liboyu/EvAid/data_align-n/recons/recons-aligned,toy,20,5,100
+/mnt/nas-cp/liboyu/EvAid/data_align-n/HFR/HFR-aligned,ball,100,5,500
+/mnt/nas-cp/liboyu/EvAid/data_align-n/HFR/HFR-aligned,blocks,100,5,500
+/mnt/nas-cp/liboyu/EvAid/data_align-n/HFR/HFR-aligned,building,150,5,750
+/mnt/nas-cp/liboyu/EvAid/data_align-n/HFR/HFR-aligned,playball,150,5,750
+/mnt/nas-cp/liboyu/EvAid/data_align-n/HFR/HFR-aligned,room1,150,5,750
+/mnt/nas-cp/liboyu/EvAid/data_align-n/HFR/HFR-aligned,room2,150,5,750
+/mnt/nas-cp/liboyu/EvAid/data_align-n/HFR/HFR-aligned,sculpture,150,5,750
+/mnt/nas-cp/liboyu/EvAid/data_align-n/HFR/HFR-aligned,traffic,100,5,500
+/mnt/nas-cp/liboyu/EvAid/data_align-n/HFR/HFR-aligned,umbrella,150,5,750
+/mnt/nas-cp/liboyu/EvAid/data_align-n/HFR/HFR-aligned,wall,150,5,750
